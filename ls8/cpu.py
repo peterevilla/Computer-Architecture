@@ -10,7 +10,7 @@ class CPU:
         self.ram  = [0] * 256  #RAM 265 
         self.reg = [0] * 8   # 8 REG
         self.pc = 0  # PROGRAM COUNTER 
-
+        self.ir = 0
         self.fl = 0
         self.ie = 0
 
@@ -81,6 +81,18 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        running = True
+        while running:
+            self.ir = self.ram_read(self.pc)
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
+
+            if self.ir == int('00000001', 2): #HLT
+                running = False
+            elif self.ir == int('10000010', 2):
+
+
+
+        
 
     
