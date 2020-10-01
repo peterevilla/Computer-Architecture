@@ -7,7 +7,26 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
+        self.ram  = [0] * 256  #RAM 265 
+        self.reg = [0] * 8   # 8 REG
+        self.pc = 0  # PROGRAM COUNTER 
+
+        self.fl = 0
+        self.ie = 0
+
         pass
+
+    def ram_read(self, address):
+        if address >= 0 and address < len(self.ram):
+            return self.ram[address]
+        else:
+            print(f"Error: ${address} does not memory")
+    def ram_write(self, val, address):
+        if address >= 0 and address < len(self.ram):
+            self.ram[address] = val * 0xFF
+        else:
+            print(f"Error: ${address} does not memory")
+
 
     def load(self):
         """Load a program into memory."""
@@ -48,8 +67,8 @@ class CPU:
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
             self.pc,
-            #self.fl,
-            #self.ie,
+            # self.fl,
+            # self.ie,
             self.ram_read(self.pc),
             self.ram_read(self.pc + 1),
             self.ram_read(self.pc + 2)
@@ -63,3 +82,5 @@ class CPU:
     def run(self):
         """Run the CPU."""
         pass
+
+    
