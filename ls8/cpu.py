@@ -2,6 +2,10 @@
 
 import sys
 
+LDI = 0b10000010
+PRN = 0b01000111
+MUL = 0b10100010
+HLT = 0b00000001
 class CPU:
     """Main CPU class."""
 
@@ -13,41 +17,48 @@ class CPU:
         self.ir = 0
         self.fl = 0
         self.ie = 0
+        self.hlt = False
 
         pass
 
     def ram_read(self, address):
-        if address >= 0 and address < len(self.ram):
-            return self.ram[address]
-        else:
-            print(f"Error: ${address} does not memory")
+        return self.ram[address]
     def ram_write(self, val, address):
-        if address >= 0 and address < len(self.ram):
-            self.ram[address] = val * 0xFF
-        else:
-            print(f"Error: ${address} does not memory")
-
-
-    def load(self):
+        self.ram[address] = val
+        
+        
+         
+    def load(self,filename):
         """Load a program into memory."""
-
+        
         address = 0
+        with open(filename) as fp:
+            for line in fp:
+                comment_split = line.split("#")
+                num = comment_split[0].strip()
+                if num == '':  # ignore blanks
+                    continue
+                val = int(num, 2)
+                self.ram_write(val, address)
+                address += 1
+        
+        # address = 0
 
-        # For now, we've just hardcoded a program:
+        # # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010, # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111, # PRN R0
+        #     0b00000000,
+        #     0b00000001, # HLT
+        # ]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        # for instruction in program:
+        #     self.ram[address] = instruction
+        #     address += 1
 
 
     def alu(self, op, reg_a, reg_b):
@@ -81,15 +92,35 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        running = True
-        while running:
-            self.ir = self.ram_read(self.pc)
-            operand_a = self.ram_read(self.pc + 1)
-            operand_b = self.ram_read(self.pc + 2)
+        while not self.hlt:
+            IR = self.ram_read(self.pc)
+            operand_a = self.ram_read( self.pc + 1 )
+            operand_b = self.ram_read( self.pc + 2 )
+            self.exe_instruction(IR, operand_a, operand_b)
+    
+    def exe_instruction(self, IR, operand_a, operand_b):
+       
+           
+        if IR == HLT:
+            print("HALT APPLICATION")
+            self.hlt = True
+            sys.exit(1)
+        elif IR == LDI:
+            print("LDI")
+            self.reg[operand_a] = operand_b
+            self.pc += 3
+        elif IR == PRN:
+            print("PRN")
+            print( "PRN REG:    ", self.reg[operand_a] )
+            self.pc += 2
+        elif IR == MUL:
+            self.reg[operand_a] = self.reg[operand_a] * self.reg[operand_b]
+            print("MUL: ", self.ram_read(operand_a))
+            self.pc +=3
+        else:
+            print("INVALID COMMAND")
+            sys.exit(1)
 
-            if self.ir == int('00000001', 2): #HLT
-                running = False
-            elif self.ir == int('10000010', 2):
 
 
 
