@@ -6,6 +6,9 @@ LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
 HLT = 0b00000001
+PUSH = 0b01000101
+POP = 0b01000110
+SP = 7
 class CPU:
     """Main CPU class."""
 
@@ -117,6 +120,20 @@ class CPU:
             self.reg[operand_a] = self.reg[operand_a] * self.reg[operand_b]
             print("MUL: ", self.ram_read(operand_a))
             self.pc +=3
+        elif IR == PUSH:
+                # decrement the stack pointer
+            self.reg[SP] -= 1
+
+            regValue = self.reg[operand_a]
+            self.ram_write(regValue, self.reg[SP])
+            self.pc += 2
+        elif IR == POP:
+           
+            topmostValue = self.ram_read(self.reg[SP])
+            self.reg[operand_a] = topmostValue
+            # increment the stack pointer
+            self.reg[SP] += 1
+            self.pc += 2
         else:
             print("INVALID COMMAND")
             sys.exit(1)
